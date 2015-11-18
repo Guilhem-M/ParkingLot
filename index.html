@@ -57,6 +57,8 @@ The next step is to give a lower weight to the pixel belonging to several parkin
 A naïve approach could be to simply to take the absolute difference between the current frame and the previous frame. However due to the noise of the camera, the evolution of the lighting condition, the small displacement (wind blowing leaves), the result is not accurate.
 The technique of mixture of Gaussians [2] solves these problems by establishing a model of the background. Each pixel’s intensity is modeled as a mixture of three to five Gaussian functions. The parameters and weight of each Gaussian is updated from frame to frame by an expectation maximization algorithm and the foreground is determined by thresholding. </p>
 
+<img src="https://cloud.githubusercontent.com/assets/15863335/11232768/cbdc0c40-8d73-11e5-944e-f2d4217b6bca.png" align="middle"/>
+
 <h2>
 <a id="34-tracking-and-parking-space-state-updating" class="anchor" href="#34-tracking-and-parking-space-state-updating" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.4 Tracking and parking space state updating</h2>
 
