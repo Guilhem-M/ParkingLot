@@ -20,22 +20,28 @@
 
     <section class="main-content">
       <h1>
-<a id="1-goal" class="anchor" href="#1-goal" aria-hidden="true"><span class="octicon octicon-link"></span></a>1 Goal</h1>
+<a id="1-goal" class="anchor" href="#1-goal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goal</h1>
 
 <p>The goal of this project is to design and develop a system which can supervise a parking lot by video surveillance.  Basically, with an input video the system should be able to detect for each parking space if a car is parked or not.</p>
 
 <h1>
-<a id="2-why-it-is-important" class="anchor" href="#2-why-it-is-important" aria-hidden="true"><span class="octicon octicon-link"></span></a>2 Why it is important</h1>
+<a id="2-why-it-is-important" class="anchor" href="#2-why-it-is-important" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why it is important</h1>
 
 <p>Several times a day we have to park our car in a parking lot: to go to work, shopping, restaurant… In urban areas, the number of cars can exceed the number of parking space. That can lead to a waste of time for the driver and troubles for the other car in the road in the case of a double park. On the other hand, people are always trying to find the best parking space (the one which is the closest to the final destination), that is why people are circling around and waste gas and time.
 An underground parking lot is easy to supervise; the only thing to do is to count the vehicle entrance and exit using barrier gates and tickets. But in the case of a free open-air parking lot with different entrances and exits, the video surveillance system is a cheap easy to install solution. 
 We can imagine a parking lot supervised by several cameras, with an algorithm detecting the availability of the parking spaces, running on a server. Then the drivers can know the best/nearest parking space available when they enter in the parking lot, thanks to an application installed on their smartphone. </p>
 
 <h1>
-<a id="3-approach" class="anchor" href="#3-approach" aria-hidden="true"><span class="octicon octicon-link"></span></a>3 Approach</h1>
+<a id="0-Abstract" class="anchor" href="#0-Abstract" aria-hidden="true"><span class="octicon octicon-link"></span></a>Abstract</h1>
+<p>During this project I have implemented an algorithm to detect the availability of a parking space based on a simple video of a parking lot. The videos were taken from the 2nd floor of Greaves Hall (USU), looking to its parking lot, with a gopro.
+A background substractor and a simple tracker has been implemented. At this point the system is able to detect the state of the parking lot when only one car is moving in the parking lot, however I proposed a method to extend the detection in the case of several cars moving at the same time.
+The accuracy of the system is hard to determine, indeed I had access to the camera only few hours, that is why I could not evaluate with precision the robustness of the system. </p>
+
+<h1>
+<a id="3-approach" class="anchor" href="#3-approach" aria-hidden="true"><span class="octicon octicon-link"></span></a>Approach</h1>
 
 <h2>
-<a id="31-general-idea" class="anchor" href="#31-general-idea" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.1 General idea</h2>
+<a id="31-general-idea" class="anchor" href="#31-general-idea" aria-hidden="true"><span class="octicon octicon-link"></span></a>General idea</h2>
 
 <p>The general idea is to separate the background and the foreground of the video. The foreground is a map of the part that has changed between the current frame and the previous frames. The foreground represents all the movements in the image.
 If we detect movements on parking space, the state (vacant or not) of the space may have changed.</p>
@@ -44,7 +50,7 @@ If we detect movements on parking space, the state (vacant or not) of the space 
 
 
 <h2>
-<a id="32-volume-estimation-and-probabilistic-representation-of-a-parking-space" class="anchor" href="#32-volume-estimation-and-probabilistic-representation-of-a-parking-space" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.2 Volume estimation and probabilistic representation of a parking space</h2>
+<a id="32-volume-estimation-and-probabilistic-representation-of-a-parking-space" class="anchor" href="#32-volume-estimation-and-probabilistic-representation-of-a-parking-space" aria-hidden="true"><span class="octicon octicon-link"></span></a>Volume estimation and probabilistic representation of a parking space</h2>
 
 <p>The current system need as an input the 2D coordinates of each parking space relative to the image. But a better representation of a parking space is a volume. Indeed a car parked on a space occupied a certain volume, and because we cannot have a camera looking perfectly perpendicular to the parking lot, we have to deal with perspective effects and possible inter-occlusion between cars. 
 I decided to implement the idea found in [1]:
@@ -55,7 +61,7 @@ The next step is to give a lower weight to the pixel belonging to several parkin
 <img src="https://cloud.githubusercontent.com/assets/15863335/11232767/ca6e075a-8d73-11e5-901c-6c4a6d3ebaa3.png" align="middle"/>
 
 <h2>
-<a id="33-background-subtraction" class="anchor" href="#33-background-subtraction" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.3 Background subtraction</h2>
+<a id="33-background-subtraction" class="anchor" href="#33-background-subtraction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background subtraction</h2>
 
 <p>This step takes care of detecting the objects which are moving in the video: we consider as the foreground the objects which are moving, and as the foreground everything that stays stationary.
 A naïve approach could be to simply to take the absolute difference between the current frame and the previous frame. However due to the noise of the camera, the evolution of the lighting condition, the small displacement (wind blowing leaves), the result is not accurate.
@@ -64,13 +70,13 @@ The technique of mixture of Gaussians [2] solves these problems by establishing 
 <img src="https://cloud.githubusercontent.com/assets/15863335/11232768/cbdc0c40-8d73-11e5-944e-f2d4217b6bca.png" align="middle"/>
 
 <h2>
-<a id="34-tracking-and-parking-space-state-updating" class="anchor" href="#34-tracking-and-parking-space-state-updating" aria-hidden="true"><span class="octicon octicon-link"></span></a>3.4 Tracking and parking space state updating</h2>
+<a id="34-tracking-and-parking-space-state-updating" class="anchor" href="#34-tracking-and-parking-space-state-updating" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tracking and parking space state updating</h2>
 
 <p>Now that the moving objects are extracted, we can track them and see if their trajectories start or end in a parking spot. The idea is to track the different moving objects, and if the trajectory is long enough, look at the starting point and try to find if it lies on one or several parking volume. In the case of several possible parking spaces (due to 3D volume overlapping), the one which returns the highest probability (see section 3.2) is chosen.  Then we can assume that a car (or other object) has left the space and we can update the state to vacant. 
 We apply the same to the end of the trajectory, but in the case that it ends in a parking spot we update the state to occupied.</p>
 
 <h1>
-<a id="4-results-and-demo" class="anchor" href="#4-results-and-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>4 Results and Demo</h1>
+<a id="4-results-and-demo" class="anchor" href="#4-results-and-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Results and Demo</h1>
 
 <p>The system gives good results when the car is not too far from the camera and when there is not too much noise in the foreground. </p>
 
@@ -78,13 +84,13 @@ We apply the same to the end of the trajectory, but in the case that it ends in 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/fmOt9r1vsCs" frameborder="0" allowfullscreen></iframe>
 
 <h1>
-<a id="5-future-work" class="anchor" href="#5-future-work" aria-hidden="true"><span class="octicon octicon-link"></span></a>5 Future work</h1>
+<a id="5-future-work" class="anchor" href="#5-future-work" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future work</h1>
 
 <p>Currently the system works only if one car is moving at a time in the parking lot. The next step is to handle multiple car tracking (blob detection in the foreground and Kalman filter to track every moving object).
 Then I have to measure the accuracy of the system and to identify in which scenario/conditions the system failed. </p>
 
 <h1>
-<a id="6-references" class="anchor" href="#6-references" aria-hidden="true"><span class="octicon octicon-link"></span></a>6 References</h1>
+<a id="6-references" class="anchor" href="#6-references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
 
 <p>[1] DELIBALTOV, Diana, WU, Wencheng, LOCE, Robert P., et al. Parking lot occupancy determination from lamp-post camera images. In : Intelligent Transportation Systems-(ITSC), 2013 16th International IEEE Conference on. IEEE, 2013. p. 2387-2392.</p>
 
