@@ -74,9 +74,21 @@ The technique of mixture of Gaussians [2] solves these problems by establishing 
 <img src="https://cloud.githubusercontent.com/assets/15863335/11232768/cbdc0c40-8d73-11e5-944e-f2d4217b6bca.png" align="middle"/>
 
 <h2>
-<a id="34-tracking-and-parking-space-state-updating" class="anchor" href="#34-tracking-and-parking-space-state-updating" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tracking and parking space state updating</h2>
+<a id="34-tracking" class="anchor" href="#34-tracking" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tracking</h2>
 
-<p>Now that the moving objects are extracted, we can track them and see if their trajectories start or end in a parking spot. The idea is to track the different moving objects, and if the trajectory is long enough, look at the starting point and try to find if it lies on one or several parking volume. In the case of several possible parking spaces (due to 3D volume overlapping), the one which returns the highest probability (see section 3.2) is chosen.  Then we can assume that a car (or other object) has left the space and we can update the state to vacant. 
+<p>Now that the moving objects are extracted, we can track them and see if their trajectories start or end in a parking spot.
+To track the objects which are moving in the parking lot we need to process the foreground and to cluster it. A blob detector can be used to perform this task. Depending of the size and the shape of each blob the image, the algorithm returns only the relevant blobs. </p>
+
+<img src="https://cloud.githubusercontent.com/assets/15863335/11765108/5f25baa4-a107-11e5-86f0-5c9e3f7d920c.png" align="middle"/>
+
+<p> Then we need to track those blobs to get their trajectories. Because the trajectory can be noisy, and disappeared due to occlusion, a Kalman filter can be used to filter and predict the trajectory.</p>
+
+<img src="https://cloud.githubusercontent.com/assets/15863335/11765134/d100cf1a-a107-11e5-826d-61b65b6606a8.png" align="middle"/>
+
+<h2>
+<a id="35-space-state-updating" class="anchor" href="#34-space-state-updating" aria-hidden="true"><span class="octicon octicon-link"></span></a>Space state update</h2>
+
+<p>Then we can process each trajectory and if it is long enough, look at the beginning and try to find if it lies on one or several parking volume. In the case of several possible parking spaces (due to 3D volume overlapping), the one which returns the highest probability is chosen.  Then we can assume that a car (or other object) has left the space and we can update the state to vacant. 
 We apply the same to the end of the trajectory, but in the case that it ends in a parking spot we update the state to occupied.</p>
 
 <h1>
