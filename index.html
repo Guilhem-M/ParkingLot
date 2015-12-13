@@ -59,7 +59,7 @@ The first step is to estimate the 3D volume of a car parked on a parking space. 
 
 <img src="https://cloud.githubusercontent.com/assets/15863335/11232767/ca6e075a-8d73-11e5-901c-6c4a6d3ebaa3.png" align="middle"/>
 
-<p></p>The next step is to give a different weight for each pixel inside the parallelepiped. Indeed we know that if a car is parked on a parking spot, the car is most likely lying around the center of the space. That is why, a 2D Gaussian function, centered on the center of the volume, is used to set the weight of each pixel inside the volume. 
+<p>The next step is to give a different weight for each pixel inside the parallelepiped. Indeed we know that if a car is parked on a parking spot, the car is most likely lying around the center of the space. That is why, a 2D Gaussian function, centered on the center of the volume, is used to set the weight of each pixel inside the volume. 
 The next step is to give a lower weight to the pixel belonging to several parking spaces. Indeed, due to the perspective, two parking spaces volume can overlap each other. </p>
 
 <img src="https://cloud.githubusercontent.com/assets/15863335/11765010/b80847ec-a105-11e5-8eef-3844d0f08596.png" align="middle"/>
